@@ -1,0 +1,61 @@
+---
+title: "writing_functions"
+author: "Pradeeti Mainali"
+date: "2024-10-24"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(rvest)
+```
+
+## writing my first function !!
+
+as an example, here is a z-score computation:
+
+```{r}
+x_vec = rnorm(n = 25, mean = 10, sd = 3.5)
+
+(x_vec - mean(x_vec)) / sd(x_vec)
+```
+
+not i'll write a function to do this
+
+```{r}
+z_scores = function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("x needs to be numeric")
+  }
+  
+  if (length(x) < 5) {
+    stop("you need at least five numbers to compute the z score")
+  }
+  
+  z = (x - mean(x)) / sd(x)
+  
+  return(z)
+  
+}
+
+z_scores(x = x_vec)
+```
+
+() will have the function and {} will hold what it should do
+
+
+does this always work?
+
+```{r, error = TRUE}
+
+z_scores(x = 3)
+# you cant compute the sd with just one numbers
+z_scores(x = c("my", "name", "is", "Jeff"))
+# no because these are characters..
+
+```
+
+
+
+
