@@ -8,6 +8,8 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(rvest)
+
+set.seed(1)
 ```
 
 ## writing my first function !!
@@ -53,6 +55,75 @@ z_scores(x = 3)
 # you cant compute the sd with just one numbers
 z_scores(x = c("my", "name", "is", "Jeff"))
 # no because these are characters..
+
+```
+
+
+## A new function!
+
+```{r}
+mean_and_sd = function(x) {
+  
+  mean_x = mean(x)
+  sd_x = sd(x)
+  
+  out_df = 
+    tibble(
+      mean = mean_x,
+      sd = sd_x
+      )
+  
+  return(out_df)
+}
+
+mean_and_sd(x_vec)
+```
+
+## Check stuff using a simulation:
+
+```{r}
+sim_df = 
+  tibble(
+    x = rnorm(30, 10, 5)
+  )
+
+sim_df |>
+  summarise(
+    mean = mean(x),
+    sd = sd(x)
+  )
+```
+
+
+Simulation function to check sample mean and sd
+
+```{r, error= TRUE}
+sim_mean_sd = function(samp_size, true_mean, true_sd) {
+  
+  sim_df = 
+  tibble(
+    x = rnorm(samp_size, true_mean, true_sd)
+  )
+
+out_df = 
+  sim_df |>
+  summarise(
+    mean = mean(x),
+    sd = sd(x)
+  )
+
+return(out_df)
+}
+
+sim_mean_sd(samp_size = 3000, true_mean = 4, true_sd = .12)
+# order doesnt matter in there
+
+sim_mean_sd(30, 16, 2)
+# this will follow the order as above
+
+#you can also set default values up on the first line of this chunk. If you do this, the following will work (because it will assume the true mean and sd:
+
+sim_mean_sd(30)
 
 ```
 

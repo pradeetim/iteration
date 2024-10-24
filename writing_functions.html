@@ -375,17 +375,18 @@ display: none;
 ## The following object is masked from &#39;package:readr&#39;:
 ## 
 ##     guess_encoding</code></pre>
+<pre class="r"><code>set.seed(1)</code></pre>
 <div id="writing-my-first-function" class="section level2">
 <h2>writing my first function !!</h2>
 <p>as an example, here is a z-score computation:</p>
 <pre class="r"><code>x_vec = rnorm(n = 25, mean = 10, sd = 3.5)
 
 (x_vec - mean(x_vec)) / sd(x_vec)</code></pre>
-<pre><code>##  [1] -1.495463284  1.083211011  0.001477144 -0.077535144  0.312820902
-##  [6] -0.426696751 -0.952339784  0.312411438  2.042168170 -0.539592873
-## [11] -0.302692814 -1.471533419  0.313086328 -0.660086025  0.504254631
-## [16]  1.595696706 -1.171271062  1.031129440 -0.228718151  0.756111426
-## [21]  1.207873154  1.078665530 -1.671292058 -0.644757372 -0.596927146</code></pre>
+<pre><code>##  [1] -0.83687228  0.01576465 -1.05703126  1.50152998  0.16928872 -1.04107494
+##  [7]  0.33550276  0.59957343  0.42849461 -0.49894708  1.41364561  0.23279252
+## [13] -0.83138529 -2.50852027  1.00648110 -0.22481531 -0.19456260  0.81587675
+## [19]  0.68682298  0.44756609  0.78971253  0.64568566 -0.09904161 -2.27133861
+## [25]  0.47485186</code></pre>
 <p>not i’ll write a function to do this</p>
 <pre class="r"><code>z_scores = function(x) {
   
@@ -404,11 +405,11 @@ display: none;
 }
 
 z_scores(x = x_vec)</code></pre>
-<pre><code>##  [1] -1.495463284  1.083211011  0.001477144 -0.077535144  0.312820902
-##  [6] -0.426696751 -0.952339784  0.312411438  2.042168170 -0.539592873
-## [11] -0.302692814 -1.471533419  0.313086328 -0.660086025  0.504254631
-## [16]  1.595696706 -1.171271062  1.031129440 -0.228718151  0.756111426
-## [21]  1.207873154  1.078665530 -1.671292058 -0.644757372 -0.596927146</code></pre>
+<pre><code>##  [1] -0.83687228  0.01576465 -1.05703126  1.50152998  0.16928872 -1.04107494
+##  [7]  0.33550276  0.59957343  0.42849461 -0.49894708  1.41364561  0.23279252
+## [13] -0.83138529 -2.50852027  1.00648110 -0.22481531 -0.19456260  0.81587675
+## [19]  0.68682298  0.44756609  0.78971253  0.64568566 -0.09904161 -2.27133861
+## [25]  0.47485186</code></pre>
 <p>() will have the function and {} will hold what it should do</p>
 <p>does this always work?</p>
 <pre class="r"><code>z_scores(x = 3)</code></pre>
@@ -417,6 +418,81 @@ z_scores(x = x_vec)</code></pre>
 z_scores(x = c(&quot;my&quot;, &quot;name&quot;, &quot;is&quot;, &quot;Jeff&quot;))</code></pre>
 <pre><code>## Error in z_scores(x = c(&quot;my&quot;, &quot;name&quot;, &quot;is&quot;, &quot;Jeff&quot;)): x needs to be numeric</code></pre>
 <pre class="r"><code># no because these are characters..</code></pre>
+</div>
+<div id="a-new-function" class="section level2">
+<h2>A new function!</h2>
+<pre class="r"><code>mean_and_sd = function(x) {
+  
+  mean_x = mean(x)
+  sd_x = sd(x)
+  
+  out_df = 
+    tibble(
+      mean = mean_x,
+      sd = sd_x
+      )
+  
+  return(out_df)
+}
+
+mean_and_sd(x_vec)</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  10.6  3.33</code></pre>
+</div>
+<div id="check-stuff-using-a-simulation" class="section level2">
+<h2>Check stuff using a simulation:</h2>
+<pre class="r"><code>sim_df = 
+  tibble(
+    x = rnorm(30, 10, 5)
+  )
+
+sim_df |&gt;
+  summarise(
+    mean = mean(x),
+    sd = sd(x)
+  )</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  10.2  3.71</code></pre>
+<p>Simulation function to check sample mean and sd</p>
+<pre class="r"><code>sim_mean_sd = function(samp_size, true_mean, true_sd) {
+  
+  sim_df = 
+  tibble(
+    x = rnorm(samp_size, true_mean, true_sd)
+  )
+
+out_df = 
+  sim_df |&gt;
+  summarise(
+    mean = mean(x),
+    sd = sd(x)
+  )
+
+return(out_df)
+}
+
+sim_mean_sd(samp_size = 3000, true_mean = 4, true_sd = .12)</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  4.00 0.125</code></pre>
+<pre class="r"><code># order doesnt matter in there
+
+sim_mean_sd(30, 16, 2)</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  16.8  2.15</code></pre>
+<pre class="r"><code># this will follow the order as above
+
+#you can also set default values up on the first line of this chunk. If you do this, the following will work (because it will assume the true mean and sd:
+
+sim_mean_sd(30)</code></pre>
+<pre><code>## Error: argument &quot;true_mean&quot; is missing, with no default</code></pre>
 </div>
 
 
