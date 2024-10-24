@@ -2,12 +2,13 @@
 title: "writing_functions"
 author: "Pradeeti Mainali"
 date: "2024-10-24"
-output: html_document
+output: github_document
 ---
 
 ```{r}
 library(tidyverse)
 library(rvest)
+library(readxl)
 
 set.seed(1)
 ```
@@ -128,5 +129,109 @@ sim_mean_sd(30)
 ```
 
 
+## revisit LoTR words
+
+```{r}
+fellowship_df = 
+  read_excel("data/LotR_Words.xlsx", range = "B3:D6") |>
+  mutate(movie = "fellowship") |>
+  janitor::clean_names()
+
+two_towers_df = 
+  read_excel("data/LotR_Words.xlsx", range = "F3:H6") |>
+  mutate(movie = "two_towers") |>
+  janitor::clean_names()
+
+return_king_df = 
+  read_excel("data/LotR_Words.xlsx", range = "J3:L6") |>
+  mutate(movie = "return_king") |>
+  janitor::clean_names()
+
+lotr_tidy = bind_rows(fellowship_df, two_towers_df, return_king_df) |>
+  janitor::clean_names() |>
+  pivot_longer(
+    female:male,
+    names_to = "sex",
+    values_to = "words") |> 
+  mutate(race = str_to_lower(race)) |> 
+  select(movie, everything()) 
+
+```
+
+```{r}
+# write something that can be used to import either one of the previous datasets:
+
+lotr_import = function(cell_range, movie_title) {
+  
+  movie_df =
+    read_excel("data/LotR_Words.xlsx", range = cell_range) |>
+    mutate(movie = movie_title) |>
+    janitor::clean_names() |>
+    pivot_longer(
+      female:male,
+      names_to = "sex",
+      values_to = "words") |>
+    select(movie, everything())
+  
+  return(movie_df)
+  
+}
+
+lotr_df = 
+  bind_rows(
+    lotr_import("B3:D6", "fellowship_ring"),
+    lotr_import("F3:H6", "two_towers"),
+    lotr_import("J3:L6", "return_king"))
+
+
+```
+
+```{r}
+nsduh_url = "http://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2k15StateFiles/NSDUHsaeShortTermCHG2015.htm"
+
+nsduh_html = read_html(nsduh_url)
+
+marj_table = 
+  nsduh_html |> 
+  html_table() |> 
+  nth(1) |>
+  slice(-1) |> 
+  mutate(drug = "marj")
+
+cocaine_table = 
+  nsduh_html |> 
+  html_table() |> 
+  nth(4) |>
+  slice(-1) |> 
+  mutate(drug = "cocaine")
+
+heroin_table = 
+  nsduh_html |> 
+  html_table() |> 
+  nth(5) |>
+  slice(-1) |> 
+  mutate(drug = "heroin")
+
+
+nsduh_table_format = function(html, table_num, table_name) {
+ 
+  out_table = 
+  html |> 
+  html_table() |> 
+  nth(table_num) |>
+  slice(-1) |> 
+  mutate(drug = table_name)
+  
+  return(out_table)
+}
+
+bind_rows(
+nsduh_table_format(html = nsduh_html, 1, "marj"),
+nsduh_table_format(html = nsduh_html, 4, "cocaine"),
+nsduh_table_format(html = nsduh_html, 5, "heroin")
+)
+
+
+```
 
 
